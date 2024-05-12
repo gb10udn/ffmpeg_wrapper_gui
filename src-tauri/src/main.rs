@@ -17,7 +17,7 @@ fn main() {
 
 
 #[tauri::command]
-fn download_ffmpeg() -> Result<(), String> {
+fn download_ffmpeg() -> Result<(), String> {  // TODO: 240511 初回の ffmpeg ダウンロードでフリーズする時間が生じる。非同期でやるべきなのだが、requwest との兼ね合いか、async 付けるだけだとうまくできなかった。
     if !Path::new(FFMPEG_PATH).exists() {
         println!("Start to download ffmpeg ...");
         let temp_dir = Path::new("./temp_ffmpeg");

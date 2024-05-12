@@ -17,7 +17,6 @@ const Uploader = (props: UploaderProps) => {
   return (
     <>
       <input type="file" accept=".mp4" onChange={upload} />
-      <video ref={props.videoRef} width={640} height={360} controls />
     </>
   )
 }

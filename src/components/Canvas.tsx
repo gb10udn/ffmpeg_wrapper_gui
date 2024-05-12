@@ -15,7 +15,9 @@ const Canvas = (props: CanvasProps) => {
 
   // TODO: 240508 ミラーリングが結構ダサいので、他の UI も検討せよ。(類似のライブラリがありそう)
   return (
-    <canvas 
+    <>
+    <video ref={props.videoRef} width={640} height={360} controls />
+    <canvas
       ref={props.canvasRef}
       onMouseDown={e => handleMouseDown(e, props.canvasRef)}
       onMouseMove={e => handleMouseMove(e, props.canvasRef)}
@@ -24,6 +26,7 @@ const Canvas = (props: CanvasProps) => {
       height={360}
     >
     </canvas>
+    </>
   )
 }
 
