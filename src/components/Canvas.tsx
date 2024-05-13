@@ -13,7 +13,7 @@ const Canvas = (props: CanvasProps) => {
     draw(props.canvasRef, props.videoRef);
   }, 10)
 
-  // TODO: 240508 ミラーリングが結構ダサいので、他の UI も検討せよ。(類似のライブラリがありそう)
+  // TODO: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう)
   return (
     <>
     <video ref={props.videoRef} width={640} height={360} controls />
@@ -24,6 +24,7 @@ const Canvas = (props: CanvasProps) => {
       onMouseUp={handleMouseUp}
       width={640}
       height={360}
+      className="mt-5"
     >
     </canvas>
     </>
@@ -47,7 +48,7 @@ const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.Ref
   }
 }
 
-const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {    // TODO: 240513 動画をアップロードしてない状態で書けてしまうので、修正せよ。
+const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {    // FIXME: 240513 動画をアップロードしてない状態で書けてしまうので、修正せよ。
   isDrawing = true;
   startPosition.x = null;
   startPosition.y = null;

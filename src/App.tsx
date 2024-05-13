@@ -18,7 +18,6 @@ const App = () => {
       <Ffmpeg />
       <Uploader videoRef={videoRef}/>
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
-      <div className="mt-5"></div>
       <Canvas canvasRef={canvasRef} videoRef={videoRef} />
     </div>
   );
