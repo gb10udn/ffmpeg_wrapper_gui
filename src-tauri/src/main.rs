@@ -2,7 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use std::path::Path;
 use std::fs;
-use reqwest::blocking::Client;
+use std::io::Write;
+use reqwest::Client;
 use zip::read::ZipArchive;
 
 const FFMPEG_PATH: &str = "./misc/ffmpeg.exe";
@@ -17,17 +18,18 @@ fn main() {
 
 
 #[tauri::command]
-fn download_ffmpeg() -> Result<(), String> {  // TODO: 240511 初回の ffmpeg ダウンロードでフリーズする時間が生じる。非同期でやるべきなのだが、requwest との兼ね合いか、async 付けるだけだとうまくできなかった。
+async fn download_ffmpeg() -> Result<(), String> {
     if !Path::new(FFMPEG_PATH).exists() {
         println!("Start to download ffmpeg ...");
         let temp_dir = Path::new("./temp_ffmpeg");
         fs::create_dir_all(temp_dir).expect("Fail to create temp directory ...");
 
         let client = Client::new();
-        let mut response = client.get(FFMPEG_URL).send().expect(format!("Fail to access -> {} ...", FFMPEG_URL).as_str());
+        let response = client.get(FFMPEG_URL).send().await.expect(format!("Fail to access -> {} ...", FFMPEG_URL).as_str());
         if response.status().is_success() {
             let mut dst = fs::File::create(temp_dir.join("ffmpeg.zip")).expect("Fail ...");
-            response.copy_to(&mut dst).expect("Fail ...");
+            let bytes = response.bytes().await.expect("Faile ....");
+            dst.write_all(&bytes).expect("Fail .....");
 
             let zip_path = temp_dir.join("ffmpeg.zip");
             let target_dir = temp_dir.join("ffmpeg");

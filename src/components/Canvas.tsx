@@ -47,7 +47,7 @@ const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.Ref
   }
 }
 
-const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
+const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {    // TODO: 240513 動画をアップロードしてない状態で書けてしまうので、修正せよ。
   isDrawing = true;
   startPosition.x = null;
   startPosition.y = null;
