@@ -2,8 +2,13 @@ import Uploader from "./components/Uploader.tsx";
 import Canvas from "./components/Canvas.tsx";
 import Controller from "./components/Controller.tsx";
 import Ffmpeg from "./components/Ffmpeg.tsx";
+import Edit from "./components/Edit.tsx";
 import { useRef, useState } from "react";
 
+export type Position = {
+  x: number | null,
+  y: number | null,
+}
 
 const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -11,6 +16,8 @@ const App = () => {
   const [mute, setMute] = useState<boolean>(false);
   const [gif, setGif] = useState<boolean>(false);
   const [compress, setComporess] = useState<boolean>(false);
+  const cropStartPosition: Position = { x: null, y: null};
+  const cropEndPosition: Position = { x: null, y: null};
 
   return (
     <div className="mx-3 mt-3">
@@ -18,7 +25,8 @@ const App = () => {
       <Ffmpeg />
       <Uploader videoRef={videoRef}/>
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
-      <Canvas canvasRef={canvasRef} videoRef={videoRef} />
+      <Edit />
+      <Canvas canvasRef={canvasRef} videoRef={videoRef} cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} />
     </div>
   );
 }

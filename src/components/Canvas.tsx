@@ -1,19 +1,68 @@
-let isDrawing: boolean = false;
-type Position = {x: number | null, y: number | null}
-const startPosition: Position = { x: null, y: null};
-const endPosition: Position = { x: null, y: null};
+import { Position } from "../App.tsx";
 
 type CanvasProps = {
   canvasRef: React.RefObject<HTMLCanvasElement>,
   videoRef: React.RefObject<HTMLVideoElement>,
+  cropStartPosition: Position,
+  cropEndPosition: Position,
 }
 
 const Canvas = (props: CanvasProps) => {
+  let isDrawing: boolean = false;
+
+  const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    
+    if (ctx) {
+      ctx.drawImage(videoRef.current!, 0, 0, canvas!.width, canvas!.height);
+  
+      if (props.cropStartPosition.x && props.cropStartPosition.y && props.cropEndPosition.x && props.cropEndPosition.y) {
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.rect(props.cropStartPosition.x, props.cropStartPosition.y, props.cropEndPosition.x - props.cropStartPosition.x, props.cropEndPosition.y - props.cropStartPosition.y);
+        ctx.stroke();
+      }
+    }
+  }
+  
+  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
+    isDrawing = true;
+    props.cropStartPosition.x = null;
+    props.cropStartPosition.y = null;
+    props.cropEndPosition.x = null;
+    props.cropEndPosition.y = null;
+  
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      
+      props.cropStartPosition.x = x;
+      props.cropStartPosition.y = y;
+    }
+  };
+  
+  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
+    if (isDrawing === false) return;
+    const canvas = canvasRef.current;
+    const rect = canvas?.getBoundingClientRect();
+    
+    props.cropEndPosition.x = event.clientX - rect!.left;
+    props.cropEndPosition.y = event.clientY - rect!.top;
+  };
+  
+  const handleMouseUp = () => {
+    isDrawing = false;
+  };
+
   setInterval(() => {
     draw(props.canvasRef, props.videoRef);
   }, 10)
 
-  // TODO: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう)
+  // TODO: 240508 ミラーリングが結構ダサいので、他の UI も検討せよ。(類似のライブラリがありそう)
   return (
     <>
     <video ref={props.videoRef} width={640} height={360} controls />
@@ -30,53 +79,5 @@ const Canvas = (props: CanvasProps) => {
     </>
   )
 }
-
-const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
-  const canvas = canvasRef.current;
-  const ctx = canvas?.getContext('2d');
-  
-  if (ctx) {
-    ctx.drawImage(videoRef.current!, 0, 0, canvas!.width, canvas!.height);
-
-    if (startPosition.x && startPosition.y && endPosition.x && endPosition.y) {
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.rect(startPosition.x, startPosition.y, endPosition.x - startPosition.x, endPosition.y - startPosition.y);
-      ctx.stroke();
-    }
-  }
-}
-
-const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {    // FIXME: 240513 動画をアップロードしてない状態で書けてしまうので、修正せよ。
-  isDrawing = true;
-  startPosition.x = null;
-  startPosition.y = null;
-  endPosition.x = null;
-  endPosition.y = null;
-
-  const canvas = canvasRef.current;
-  if (canvas) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    
-    startPosition.x = x;
-    startPosition.y = y;
-  }
-};
-
-const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  if (isDrawing === false) return;
-  const canvas = canvasRef.current;
-  const rect = canvas?.getBoundingClientRect();
-  
-  endPosition.x = event.clientX - rect!.left;
-  endPosition.y = event.clientY - rect!.top;
-};
-
-const handleMouseUp = () => {
-  isDrawing = false;
-};
 
 export default Canvas
