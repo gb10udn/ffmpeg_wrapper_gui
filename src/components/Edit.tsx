@@ -11,7 +11,6 @@ const Edit = (props: EditProps) => {
   const crop = () => {
     if (!(props.path && props.cropStartPosition.x && props.cropStartPosition.y && props.cropEndPosition.x && props.cropEndPosition.y)) return;
 
-    
     invoke("crop", {
       src: props.path,
       startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では変換されていた。
