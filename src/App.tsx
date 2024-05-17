@@ -15,17 +15,18 @@ const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mute, setMute] = useState<boolean>(false);
   const [gif, setGif] = useState<boolean>(false);
+  const [path, setPath] = useState<string | null>(null);
   const [compress, setComporess] = useState<boolean>(false);
-  const cropStartPosition: Position = { x: null, y: null};
-  const cropEndPosition: Position = { x: null, y: null};
+  const cropStartPosition: Position = {x: null, y: null};
+  const cropEndPosition: Position = {x: null, y: null};
 
   return (
     <div className="mx-3 mt-3">
       <h1 className="text-3xl font-bold">ffmpeg wrapper gui</h1>
       <Ffmpeg />
-      <Uploader videoRef={videoRef}/>
+      <Uploader videoRef={videoRef} path={path} setPath={setPath} />
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
-      <Edit />
+      <Edit cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} path={path} />
       <Canvas canvasRef={canvasRef} videoRef={videoRef} cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} />
     </div>
   );

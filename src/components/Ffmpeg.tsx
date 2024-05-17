@@ -33,7 +33,7 @@ const Ffmpeg = () => {
   }, []);
 
   return (
-    // TODO: 240513 
+    // TODO: 240513 もう少し直感的な UI にすること。
     <p>ffmpeg downloaded → {String(downloaded)} / downloading → {String(downloading)}</p>
   )
 }

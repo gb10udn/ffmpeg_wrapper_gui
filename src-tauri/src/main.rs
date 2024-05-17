@@ -3,6 +3,7 @@
 use std::path::Path;
 use std::fs;
 use std::io::Write;
+use std::process::{Command, Stdio};
 use reqwest::Client;
 use zip::read::ZipArchive;
 
@@ -11,7 +12,7 @@ const FFMPEG_URL: &str = "https://github.com/BtbN/FFmpeg-Builds/releases/downloa
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded])
+        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded, crop])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -55,4 +56,39 @@ async fn download_ffmpeg() -> Result<(), String> {
 #[tauri::command]
 fn check_ffmpeg_downloaded() -> bool {
     Path::new(FFMPEG_PATH).exists()
+}
+
+// TODO: 240517 非同期処理にすること。(ffmpeg 実行中フリーズする。)
+#[tauri::command]
+fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) -> Result<(), String> {
+    if Path::new(FFMPEG_PATH).exists() {
+        let path_obj = Path::new(&src);
+        let dst_fname = path_obj.file_stem().unwrap().to_string_lossy();
+
+        let dst: String;
+        if let Some(dst_dir) = path_obj.parent() {
+            dst = format!("{}/{}_cropped_x={}_y={}_w={}_h={}.mp4", dst_dir.to_string_lossy(), dst_fname, start_x, start_y, width, height);
+        } else {
+            dst = format!("{}_cropped_x={}_y={}_w={}_h={}.mp4", dst_fname, start_x, start_y, width, height);
+        }
+
+        // ffmpeg -i sample_movie.mp4 -vf crop=w=80:h=72:x=0:y=0 output.mp4
+        Command::new(FFMPEG_PATH)
+            .args([
+                "-i",
+                &src,
+                "-vf",
+                &format!("crop=w={}:h={}:x={}:y={}", width, height, start_x, start_y),
+                "-r",
+                "10",
+                &dst,
+            ])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .expect("\n\nFailed to execute command\n\n");
+        Ok(())        
+    } else {
+        Err(String::from(format!("File not found -> {}", src)))
+    }
 }

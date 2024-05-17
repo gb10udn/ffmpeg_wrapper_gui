@@ -3,14 +3,17 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 type UploaderProps = {
   videoRef: React.RefObject<HTMLVideoElement>,
+  path: string | null,
+  setPath: React.Dispatch<React.SetStateAction<string | null>>,
 }
 
 const Uploader = (props: UploaderProps) => {
   const upload = async () => {
-    const file = await open();
-    if (typeof file === 'string') {
-      if (props.videoRef.current) {
-        props.videoRef.current.src = convertFileSrc(file);
+    const temp_path = await open();
+    if (typeof temp_path === 'string') {
+      props.setPath(temp_path);
+      if (props.videoRef.current && typeof props.path === 'string') {
+        props.videoRef.current.src = convertFileSrc(props.path);
       }
     }    
   }
