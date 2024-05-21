@@ -25,6 +25,7 @@ const Canvas = (props: CanvasProps) => {
         ctx.stroke();
       }
     }
+    requestAnimationFrame(() => draw(canvasRef, videoRef));
   }
   
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
@@ -58,9 +59,8 @@ const Canvas = (props: CanvasProps) => {
     isDrawing = false;
   };
 
-  setInterval(() => {
-    draw(props.canvasRef, props.videoRef);
-  }, 10)
+  requestAnimationFrame(() => draw(props.canvasRef, props.videoRef));
+
 
   // TODO: 240508 ミラーリングが結構ダサいので、他の UI も検討せよ。(類似のライブラリがありそう)
   return (

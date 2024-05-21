@@ -19,7 +19,7 @@ const Uploader = (props: UploaderProps) => {
     const temp_path = await open();
     if (typeof temp_path === 'string') {
       props.setPath(temp_path);
-    }    
+    }
   }
 
   // TODO: 240508 ドラッグアンドドロップでアップロードできるようにせよ。
