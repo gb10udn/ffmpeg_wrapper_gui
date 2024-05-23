@@ -1,5 +1,5 @@
 import { Position } from "../App.tsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type CanvasProps = {
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -10,7 +10,7 @@ type CanvasProps = {
   setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
 }
 
-const Canvas = (props: CanvasProps) => {
+const Canvas = (props: CanvasProps) => {  // EDIT: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
   let [isDrawing, setIsDrawing] = useState<boolean>(false);
 
   const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
@@ -28,7 +28,6 @@ const Canvas = (props: CanvasProps) => {
         ctx.stroke();
       }
     }
-    requestAnimationFrame(() => draw(canvasRef, videoRef));  // EDIT: 240523 呼び出し回数が多く、GPU を大幅に使用するので修正せよ。
   }
   
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
@@ -60,7 +59,9 @@ const Canvas = (props: CanvasProps) => {
     setIsDrawing(false);
   };
 
-  requestAnimationFrame(() => draw(props.canvasRef, props.videoRef));
+  useEffect(() => {
+    draw(props.canvasRef, props.videoRef);
+  }, [props.cropStartPosition, props.cropEndPosition]);
 
 
   // TODO: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう or 動画部分隠して、時間をスクロールで指定してカレント値の指定をするといいかも？)
