@@ -1,14 +1,17 @@
 import { Position } from "../App.tsx";
+import { useState } from "react";
 
 type CanvasProps = {
   canvasRef: React.RefObject<HTMLCanvasElement>,
   videoRef: React.RefObject<HTMLVideoElement>,
   cropStartPosition: Position,
   cropEndPosition: Position,
+  setCropStartPosition: React.Dispatch<React.SetStateAction<Position>>,
+  setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
 }
 
 const Canvas = (props: CanvasProps) => {
-  let isDrawing: boolean = false;
+  let [isDrawing, setIsDrawing] = useState<boolean>(false);
 
   const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
     const canvas = canvasRef.current;
@@ -25,15 +28,13 @@ const Canvas = (props: CanvasProps) => {
         ctx.stroke();
       }
     }
-    requestAnimationFrame(() => draw(canvasRef, videoRef));
+    requestAnimationFrame(() => draw(canvasRef, videoRef));  // EDIT: 240523 呼び出し回数が多く、GPU を大幅に使用するので修正せよ。
   }
   
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
-    isDrawing = true;
-    props.cropStartPosition.x = null;
-    props.cropStartPosition.y = null;
-    props.cropEndPosition.x = null;
-    props.cropEndPosition.y = null;
+    setIsDrawing(true);
+    props.setCropStartPosition({x: null, y: null});
+    props.setCropEndPosition({x: null, y: null});
   
     const canvas = canvasRef.current;
     if (canvas) {
@@ -41,8 +42,7 @@ const Canvas = (props: CanvasProps) => {
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
       
-      props.cropStartPosition.x = x;
-      props.cropStartPosition.y = y;
+      props.setCropStartPosition({x: x, y: y});
     }
   };
   
@@ -51,18 +51,20 @@ const Canvas = (props: CanvasProps) => {
     const canvas = canvasRef.current;
     const rect = canvas?.getBoundingClientRect();
     
-    props.cropEndPosition.x = event.clientX - rect!.left;
-    props.cropEndPosition.y = event.clientY - rect!.top;
+    const x = event.clientX - rect!.left;
+    const y = event.clientY - rect!.top;
+    props.setCropEndPosition({x: x, y: y});
   };
   
   const handleMouseUp = () => {
-    isDrawing = false;
+    setIsDrawing(false);
   };
 
   requestAnimationFrame(() => draw(props.canvasRef, props.videoRef));
 
 
-  // TODO: 240508 ミラーリングが結構ダサいので、他の UI も検討せよ。(類似のライブラリがありそう)
+  // TODO: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう or 動画部分隠して、時間をスクロールで指定してカレント値の指定をするといいかも？)
+  // TODO: 240521 横幅 (640 px) が一致しない場合でも計算して合わせる
   return (
     <>
     <video ref={props.videoRef} width={640} height={360} controls />

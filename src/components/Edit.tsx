@@ -13,7 +13,7 @@ const Edit = (props: EditProps) => {
 
     invoke("crop", {
       src: props.path,
-      startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では変換されていた。
+      startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では startX のように変換されていた。
       startY: Math.trunc(Math.min(props.cropStartPosition.y, props.cropEndPosition.y)),
       width: Math.trunc(Math.abs(props.cropStartPosition.x - props.cropEndPosition.x)),
       height: Math.trunc(Math.abs(props.cropStartPosition.y - props.cropEndPosition.y)),
