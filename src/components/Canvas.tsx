@@ -10,7 +10,7 @@ type CanvasProps = {
   setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
 }
 
-const Canvas = (props: CanvasProps) => {  // EDIT: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
+const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
   let [isDrawing, setIsDrawing] = useState<boolean>(false);
 
   const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
@@ -60,7 +60,17 @@ const Canvas = (props: CanvasProps) => {  // EDIT: 240523 movie をアップロ�
   };
 
   useEffect(() => {
-    draw(props.canvasRef, props.videoRef);
+    const videoElement = props.videoRef.current;
+    if (!videoElement) return;
+    const handelTimeUpdate = () => {
+      draw(props.canvasRef, props.videoRef);
+    }
+    handelTimeUpdate();
+
+    videoElement.addEventListener('timeupdate', handelTimeUpdate);
+    return () => {
+      videoElement.removeEventListener('timeupdate', handelTimeUpdate);
+    };
   }, [props.cropStartPosition, props.cropEndPosition]);
 
 
