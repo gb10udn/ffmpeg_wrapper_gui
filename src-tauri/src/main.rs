@@ -58,9 +58,8 @@ fn check_ffmpeg_downloaded() -> bool {
     Path::new(FFMPEG_PATH).exists()
 }
 
-// TODO: 240517 非同期処理にすること。(ffmpeg 実行中フリーズする。)
 #[tauri::command]
-fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) -> Result<(), String> {
+async fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) -> Result<(), String> {
     if Path::new(FFMPEG_PATH).exists() {
         let path_obj = Path::new(&src);
         let dst_fname = path_obj.file_stem().unwrap().to_string_lossy();
