@@ -25,6 +25,7 @@ const Edit = (props: EditProps) => {
   }
 
   return (
+    // TODO: 240601 Edit (Crop など) の処理は時間がかかるので、実行中は再度クリックできないようにしていいかも？
     <button onClick={crop}>Edit</button>
   );
 }

@@ -8,10 +8,12 @@ type CanvasProps = {
   cropEndPosition: Position,
   setCropStartPosition: React.Dispatch<React.SetStateAction<Position>>,
   setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
+  movieDuration: number | undefined,
 }
 
 const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
   let [isDrawing, setIsDrawing] = useState<boolean>(false);
+  let [currentTime, setCurrentTime] = useState<number>(0.0);
 
   const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
     const canvas = canvasRef.current;
@@ -59,6 +61,13 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
     setIsDrawing(false);
   };
 
+  const handleSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentTime(Number(e.target.value));
+    if (props.videoRef.current) {
+      props.videoRef.current.currentTime = Number(e.target.value);
+    }
+  }
+
   useEffect(() => {
     const videoElement = props.videoRef.current;
     if (!videoElement) return;
@@ -66,15 +75,14 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
       draw(props.canvasRef, props.videoRef);
     }
     handelTimeUpdate();
+    videoElement.addEventListener('timeupdate', handelTimeUpdate);  // EDIT: 240602 videoRef で操作しないので、非表示にして、削除せよ。
 
-    videoElement.addEventListener('timeupdate', handelTimeUpdate);
     return () => {
       videoElement.removeEventListener('timeupdate', handelTimeUpdate);
     };
   }, [props.cropStartPosition, props.cropEndPosition]);
 
 
-  // TODO: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう or 動画部分隠して、時間をスクロールで指定してカレント値の指定をするといいかも？)
   // TODO: 240521 横幅 (640 px) が一致しない場合でも計算して合わせる
   return (
     <>
@@ -87,8 +95,11 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
       width={640}
       height={360}
       className="mt-5"
-    >
+      >
     </canvas>
+
+    {/* EDIT: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう or 動画部分隠して、時間をスクロールで指定してカレント値の指定をするといいかも？) */}
+    <input type="range" min="0" max={props.movieDuration} step="0.1" value={currentTime} onChange={handleSlider}></input>
     </>
   )
 }

@@ -6,12 +6,16 @@ type UploaderProps = {
   videoRef: React.RefObject<HTMLVideoElement>,
   path: string | null,
   setPath: React.Dispatch<React.SetStateAction<string | null>>,
+  setMovieDuration: React.Dispatch<React.SetStateAction<number | undefined>>,
 }
 
 const Uploader = (props: UploaderProps) => {
   useEffect(() => {
     if (props.videoRef.current && typeof props.path === 'string') {
       props.videoRef.current.src = convertFileSrc(props.path);
+      props.videoRef.current.addEventListener('loadeddata', () => {
+        props.setMovieDuration(props.videoRef.current?.duration);
+      });
     }
   }, [props.path]);
 
