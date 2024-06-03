@@ -13,7 +13,7 @@ type CanvasProps = {
 
 const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
   let [isDrawing, setIsDrawing] = useState<boolean>(false);
-  let [currentTime, setCurrentTime] = useState<number>(0.0);
+  let [currentTime, setCurrentTime] = useState<number>(0.0);  // TODO: 240603 初期値を真ん中にしないと、アップロード完了したかが分からなくなる気がする？
 
   const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
     const canvas = canvasRef.current;
@@ -71,14 +71,14 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
   useEffect(() => {
     const videoElement = props.videoRef.current;
     if (!videoElement) return;
-    const handelTimeUpdate = () => {
+    const handleTimeUpdate = () => {
       draw(props.canvasRef, props.videoRef);
     }
-    handelTimeUpdate();
-    videoElement.addEventListener('timeupdate', handelTimeUpdate);  // EDIT: 240602 videoRef で操作しないので、非表示にして、削除せよ。
+    handleTimeUpdate();
+    videoElement.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
-      videoElement.removeEventListener('timeupdate', handelTimeUpdate);
+      videoElement.removeEventListener('timeupdate', handleTimeUpdate);
     };
   }, [props.cropStartPosition, props.cropEndPosition]);
 
@@ -86,7 +86,7 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
   // TODO: 240521 横幅 (640 px) が一致しない場合でも計算して合わせる
   return (
     <>
-    <video ref={props.videoRef} width={640} height={360} controls />
+    <video ref={props.videoRef} width={640} height={360} controls hidden/>
     <canvas
       ref={props.canvasRef}
       onMouseDown={e => handleMouseDown(e, props.canvasRef)}
@@ -97,8 +97,6 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
       className="mt-5"
       >
     </canvas>
-
-    {/* EDIT: 240508 ミラーリングが冗長なので、他の UI も検討せよ。(類似のライブラリがありそう or 動画部分隠して、時間をスクロールで指定してカレント値の指定をするといいかも？) */}
     <input type="range" min="0" max={props.movieDuration} step="0.1" value={currentTime} onChange={handleSlider}></input>
     </>
   )
