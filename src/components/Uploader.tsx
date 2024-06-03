@@ -4,18 +4,29 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 
 type UploaderProps = {
   videoRef: React.RefObject<HTMLVideoElement>,
+  canvasRef: React.RefObject<HTMLCanvasElement>,
   path: string | null,
   setPath: React.Dispatch<React.SetStateAction<string | null>>,
   setMovieDuration: React.Dispatch<React.SetStateAction<number | undefined>>,
+  draw: any,  // HACK: 240603 型指定すること (type で独自型を定義する？)
 }
 
 const Uploader = (props: UploaderProps) => {
   useEffect(() => {
-    if (props.videoRef.current && typeof props.path === 'string') {
-      props.videoRef.current.src = convertFileSrc(props.path);
-      props.videoRef.current.addEventListener('loadeddata', () => {
-        props.setMovieDuration(props.videoRef.current?.duration);
+    const handleTimeUpdate = () => {
+      props.draw(props.canvasRef, props.videoRef);
+    }
+    const videoElement = props.videoRef.current;
+    if (videoElement && typeof props.path === 'string') {
+      videoElement.src = convertFileSrc(props.path);
+      videoElement.addEventListener('loadeddata', () => {
+        props.setMovieDuration(videoElement.duration);
+        videoElement.addEventListener('timeupdate', handleTimeUpdate);
+        videoElement.currentTime = 0;  // INFO: 240603 これを入れると、読み込み直後に canvas に video のイメージが正しく描画される。
       });
+      return () => {
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+      };
     }
   }, [props.path]);
 

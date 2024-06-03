@@ -22,11 +22,35 @@ const App = () => {
   const [cropStartPosition, setCropStartPosition] = useState<Position>({x: null, y: null})
   const [cropEndPosition, setCropEndPosition] = useState<Position>({x: null, y: null})
 
+  const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    
+    if (ctx) {
+      ctx.drawImage(videoRef.current!, 0, 0, canvas!.width, canvas!.height);
+  
+      if (cropStartPosition.x && cropStartPosition.y && cropEndPosition.x && cropEndPosition.y) {
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.rect(cropStartPosition.x, cropStartPosition.y, cropEndPosition.x - cropStartPosition.x, cropEndPosition.y - cropStartPosition.y);
+        ctx.stroke();
+      }
+    }
+  }
+
   return (
     <div className="mx-3 mt-3">
       <h1 className="text-3xl font-bold">ffmpeg wrapper gui</h1>
       <Ffmpeg />
-      <Uploader videoRef={videoRef} path={path} setPath={setPath} setMovieDuration={setMovieDuration} />
+      <Uploader
+        videoRef={videoRef}
+        canvasRef={canvasRef}
+        path={path}
+        setPath={setPath}
+        setMovieDuration={setMovieDuration}
+        draw={draw}
+      />
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
       <Edit cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} path={path} />
       
@@ -38,6 +62,7 @@ const App = () => {
         setCropStartPosition={setCropStartPosition}
         setCropEndPosition={setCropEndPosition}
         movieDuration={movieDuration}
+        draw={draw}
       />
     </div>
   );
