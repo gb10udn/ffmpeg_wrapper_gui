@@ -1,4 +1,5 @@
 import { Position } from "../App.tsx";
+import { DrawFunction } from './types.ts'
 import { useState, useEffect } from "react";
 
 type CanvasProps = {
@@ -9,7 +10,7 @@ type CanvasProps = {
   setCropStartPosition: React.Dispatch<React.SetStateAction<Position>>,
   setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
   movieDuration: number | undefined,
-  draw: any,  // HACK: 240603 型指定すること (type で独自型を定義する？)
+  draw: DrawFunction,
 }
 
 const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。

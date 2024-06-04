@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { open } from '@tauri-apps/api/dialog';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { DrawFunction } from './types.ts'
 
 type UploaderProps = {
   videoRef: React.RefObject<HTMLVideoElement>,
@@ -8,7 +9,7 @@ type UploaderProps = {
   path: string | null,
   setPath: React.Dispatch<React.SetStateAction<string | null>>,
   setMovieDuration: React.Dispatch<React.SetStateAction<number | undefined>>,
-  draw: any,  // HACK: 240603 型指定すること (type で独自型を定義する？)
+  draw: DrawFunction,
 }
 
 const Uploader = (props: UploaderProps) => {

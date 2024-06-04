@@ -29,7 +29,7 @@ const App = () => {
     if (ctx) {
       ctx.drawImage(videoRef.current!, 0, 0, canvas!.width, canvas!.height);
   
-      if (cropStartPosition.x && cropStartPosition.y && cropEndPosition.x && cropEndPosition.y) {
+      if (cropStartPosition.x && cropStartPosition.y && cropEndPosition.x && cropEndPosition.y) {  // FIXME: 240604 時間を変更すると、赤の四角が消えてしまうので修正せよ。
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.beginPath();
