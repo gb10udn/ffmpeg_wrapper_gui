@@ -3,12 +3,8 @@ import Canvas from "./components/Canvas.tsx";
 import Controller from "./components/Controller.tsx";
 import Ffmpeg from "./components/Ffmpeg.tsx";
 import Edit from "./components/Edit.tsx";
+import { Position } from "./components/types.ts";
 import { useRef, useState } from "react";
-
-export type Position = {
-  x: number | null,
-  y: number | null,
-}
 
 const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -22,14 +18,14 @@ const App = () => {
   const [cropStartPosition, setCropStartPosition] = useState<Position>({x: null, y: null})
   const [cropEndPosition, setCropEndPosition] = useState<Position>({x: null, y: null})
 
-  const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>) => {
+  const draw = (canvasRef: React.RefObject<HTMLCanvasElement>, videoRef: React.RefObject<HTMLVideoElement>, cropStartPosition: Position, cropEndPosition: Position) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
-    
-    if (ctx) {
+    const videoCurrent = videoRef.current;
+    if (ctx && videoCurrent && videoCurrent.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
       ctx.drawImage(videoRef.current!, 0, 0, canvas!.width, canvas!.height);
   
-      if (cropStartPosition.x && cropStartPosition.y && cropEndPosition.x && cropEndPosition.y) {  // FIXME: 240604 時間を変更すると、赤の四角が消えてしまうので修正せよ。
+      if (cropStartPosition.x && cropStartPosition.y && cropEndPosition.x && cropEndPosition.y) {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -49,6 +45,8 @@ const App = () => {
         path={path}
         setPath={setPath}
         setMovieDuration={setMovieDuration}
+        cropStartPosition={cropStartPosition}
+        cropEndPosition={cropEndPosition}
         draw={draw}
       />
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />

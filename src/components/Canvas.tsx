@@ -1,4 +1,4 @@
-import { Position } from "../App.tsx";
+import { Position } from "./types.ts";
 import { DrawFunction } from './types.ts'
 import { useState, useEffect } from "react";
 
@@ -13,7 +13,7 @@ type CanvasProps = {
   draw: DrawFunction,
 }
 
-const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロードしていないときに、四角が何重にも描画される問題を修正せよ。
+const Canvas = (props: CanvasProps) => {
   let [isDrawing, setIsDrawing] = useState<boolean>(false);
   let [currentTime, setCurrentTime] = useState<number>(0.0);
   
@@ -56,7 +56,7 @@ const Canvas = (props: CanvasProps) => {  // FIXME: 240523 movie をアップロ
   useEffect(() => {
     const videoElement = props.videoRef.current;
     if (!videoElement) return;
-    props.draw(props.canvasRef, props.videoRef);
+    props.draw(props.canvasRef, props.videoRef, props.cropStartPosition, props.cropEndPosition);
   }, [props.cropStartPosition, props.cropEndPosition]);
 
 

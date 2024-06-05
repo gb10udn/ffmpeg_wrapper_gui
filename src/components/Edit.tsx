@@ -1,4 +1,4 @@
-import { Position } from "../App.tsx"
+import { Position } from "./types.ts"
 import { invoke } from "@tauri-apps/api/tauri";
 
 type EditProps = {
