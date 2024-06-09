@@ -11,11 +11,13 @@ type CanvasProps = {
   setCropEndPosition: React.Dispatch<React.SetStateAction<Position>>,
   movieDuration: number | undefined,
   draw: DrawFunction,
+  movieWidth: number,
+  movieHeight: number,
 }
 
 const Canvas = (props: CanvasProps) => {
-  let [isDrawing, setIsDrawing] = useState<boolean>(false);
-  let [currentTime, setCurrentTime] = useState<number>(0.0);
+  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0.0);
   
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>, canvasRef: React.RefObject<HTMLCanvasElement>) => {
     setIsDrawing(true);
@@ -60,17 +62,16 @@ const Canvas = (props: CanvasProps) => {
   }, [props.cropStartPosition, props.cropEndPosition]);
 
 
-  // TODO: 240521 横幅 (640 px) が一致しない場合でも計算して合わせる
   return (
     <>
-    <video ref={props.videoRef} width={640} height={360} controls hidden />
+    <video ref={props.videoRef} width={props.movieWidth} height={props.movieHeight} controls hidden />
     <canvas
       ref={props.canvasRef}
       onMouseDown={e => handleMouseDown(e, props.canvasRef)}
       onMouseMove={e => handleMouseMove(e, props.canvasRef)}
       onMouseUp={handleMouseUp}
-      width={640}
-      height={360}
+      width={props.movieWidth}
+      height={props.movieHeight}
       className="mt-5"
       >
     </canvas>

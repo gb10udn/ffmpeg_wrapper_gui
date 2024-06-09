@@ -13,6 +13,8 @@ const App = () => {
   const [gif, setGif] = useState<boolean>(false);
   const [path, setPath] = useState<string | null>(null);
   const [movieDuration, setMovieDuration] = useState<number | undefined>(undefined);
+  const [movieWidth, setMovieWidth] = useState<number>(640);
+  const [movieHeight, setMovieHeight] = useState<number>(360);
 
   const [compress, setComporess] = useState<boolean>(false);
   const [cropStartPosition, setCropStartPosition] = useState<Position>({x: null, y: null})
@@ -48,6 +50,8 @@ const App = () => {
         cropStartPosition={cropStartPosition}
         cropEndPosition={cropEndPosition}
         draw={draw}
+        setMovieWidth={setMovieWidth}
+        setMovieHeight={setMovieHeight}
       />
       <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
       <Edit cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} path={path} />
@@ -61,6 +65,8 @@ const App = () => {
         setCropEndPosition={setCropEndPosition}
         movieDuration={movieDuration}
         draw={draw}
+        movieWidth={movieWidth}
+        movieHeight={movieHeight}
       />
     </div>
   );

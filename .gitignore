@@ -1,4 +1,4 @@
-public/sample_movie.mp4
+public/*.mp4
 src-tauri/misc/ffmpeg.exe
 
 # Logs

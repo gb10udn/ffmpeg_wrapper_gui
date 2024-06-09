@@ -13,6 +13,8 @@ type UploaderProps = {
   cropStartPosition: Position,
   cropEndPosition: Position,
   draw: DrawFunction,
+  setMovieWidth: React.Dispatch<React.SetStateAction<number>>,
+  setMovieHeight: React.Dispatch<React.SetStateAction<number>>,
 }
 
 const Uploader = (props: UploaderProps) => {
@@ -25,6 +27,8 @@ const Uploader = (props: UploaderProps) => {
     if (videoElement && typeof props.path === 'string') {
       videoElement.src = convertFileSrc(props.path);
       videoElement.addEventListener('loadeddata', () => {
+        props.setMovieWidth(videoElement.videoWidth);  // TODO: 240609 App の画面より大きい動画だとはみ出るので、縮小できるようにせよ。
+        props.setMovieHeight(videoElement.videoHeight);
         props.setMovieDuration(videoElement.duration);
         videoElement.currentTime = 0.0;  // INFO: 240603 これを入れると、読み込み直後に canvas に video のイメージが正しく描画される。(???)
       });
