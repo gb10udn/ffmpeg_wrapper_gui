@@ -1,6 +1,5 @@
 import Uploader from "./components/Uploader.tsx";
 import Canvas from "./components/Canvas.tsx";
-import Controller from "./components/Controller.tsx";
 import Ffmpeg from "./components/Ffmpeg.tsx";
 import Edit from "./components/Edit.tsx";
 import { Position } from "./components/types.ts";
@@ -9,14 +8,15 @@ import { useRef, useState } from "react";
 const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mute, setMute] = useState<boolean>(false);
+  const [mute, setMute] = useState<boolean>(true);  // INFO: 240611 mute を初期値とする。
   const [gif, setGif] = useState<boolean>(false);
+  const [compress, setComporess] = useState<boolean>(false);
+  const [crop, setCrop] = useState<boolean>(false);
   const [path, setPath] = useState<string | null>(null);
   const [movieDuration, setMovieDuration] = useState<number | undefined>(undefined);
   const [movieWidth, setMovieWidth] = useState<number>(640);
   const [movieHeight, setMovieHeight] = useState<number>(360);
 
-  const [compress, setComporess] = useState<boolean>(false);
   const [cropStartPosition, setCropStartPosition] = useState<Position>({x: null, y: null})
   const [cropEndPosition, setCropEndPosition] = useState<Position>({x: null, y: null})
 
@@ -53,8 +53,19 @@ const App = () => {
         setMovieWidth={setMovieWidth}
         setMovieHeight={setMovieHeight}
       />
-      <Controller mute={mute} setMute={setMute} gif={gif} setGif={setGif} compress={compress} setComporess={setComporess} />
-      <Edit cropStartPosition={cropStartPosition} cropEndPosition={cropEndPosition} path={path} />
+      <Edit 
+        mute={mute}
+        setMute={setMute}
+        gif={gif}
+        setGif={setGif}
+        compress={compress}
+        setComporess={setComporess}
+        crop={crop}
+        setCrop={setCrop}
+        cropStartPosition={cropStartPosition}
+        cropEndPosition={cropEndPosition}
+        path={path}
+      />
       
       <Canvas
         canvasRef={canvasRef}
