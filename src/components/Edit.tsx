@@ -1,5 +1,6 @@
 import { Position } from "./types.ts"
 import { invoke } from "@tauri-apps/api/tauri";
+import { useState } from "react";
 
 type EditProps = {
   mute: boolean,
@@ -16,6 +17,9 @@ type EditProps = {
 }
 
 const Edit = (props: EditProps) => {
+  const [compressParam, setCompressParam] = useState<number>(30);
+  const [gifWidth, setGifWidth] = useState<number>(1280);
+
   const edit = () => {
     if (props.mute) {
       invoke('mute', {
@@ -25,14 +29,30 @@ const Edit = (props: EditProps) => {
       }).catch((err) => {
         console.log(err);
       })
-    
+
     } else if (props.gif) {
-      // TODO: 240612 gif 関数を実行せよ。(パラメタ設定の UI も考えること)
+      invoke('create_gif', {
+        src: props.path,
+        width: gifWidth,
+      }).then(() => {
+        console.log('Success "gif" !!!');
+      }).catch((err) => {
+        console.log(err);
+      })
+    
     } else if (props.compress) {
-      // TODO: 240612 compress 関数を実行せよ。(パラメタ設定の UI も考えること)
+      invoke('compress_movie', {
+        src: props.path,
+        compressParam: compressParam,
+      }).then(() => {
+        console.log('Success "compress" !!!');
+      }).catch((err) => {
+        console.log(err);
+      })
+    
     } else if (props.crop) {
       if (!(props.path && props.cropStartPosition.x && props.cropStartPosition.y && props.cropEndPosition.x && props.cropEndPosition.y)) return;
-      invoke("crop", {
+      invoke('crop', {
         src: props.path,
         startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では startX のように変換されていた。
         startY: Math.trunc(Math.min(props.cropStartPosition.y, props.cropEndPosition.y)),
@@ -103,7 +123,21 @@ const Edit = (props: EditProps) => {
           </div>
         </li>
       </ul>
-      {/* TODO: 240611 radio ボタンの分岐によって、適切にバックエンドに処理を投げること。 */}
+
+      { props.compress &&
+        <div>
+          <label htmlFor="compress-param">compress parameter</label>
+          <input type="number" value={compressParam} id="compress-param" onChange={(event) => {setCompressParam(Number(event.target.value))}}/>
+        </div>
+      }
+      
+      { props.gif &&
+        <div>
+          <label htmlFor="gif-width">gif width</label>
+          <input type="number" value={gifWidth} id="gif-width" onChange={(event) => {setGifWidth(Number(event.target.value))}} />
+        </div>
+      }
+
       <button onClick={edit}>Edit</button>
     </>
   );
