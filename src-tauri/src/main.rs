@@ -12,7 +12,7 @@ const FFMPEG_URL: &str = "https://github.com/BtbN/FFmpeg-Builds/releases/downloa
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded, crop])
+        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded, crop, mute])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -60,7 +60,7 @@ fn check_ffmpeg_downloaded() -> bool {
 
 #[tauri::command]
 async fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) -> Result<(), String> {
-    if Path::new(FFMPEG_PATH).exists() {
+    if Path::new(FFMPEG_PATH).exists() && Path::new(&src).exists() {
         let path_obj = Path::new(&src);
         let dst_fname = path_obj.file_stem().unwrap().to_string_lossy();
 
@@ -88,6 +88,36 @@ async fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) 
             .expect("\n\nFailed to execute command\n\n");
         Ok(())        
     } else {
-        Err(String::from(format!("File not found -> {}", src)))
+        Err(String::from("File not found"))
     }
+}
+
+#[tauri::command]
+async fn mute(src: String) -> Result<(), String> {
+    if Path::new(FFMPEG_PATH).exists() && Path::new(&src).exists() {
+        let dst = obtain_dst_path(&src, "mute", "mp4");
+        Command::new(FFMPEG_PATH)
+            .args([
+                "-i",
+               &src,
+               "-vcodec",
+               "copy",
+               "-an",
+               &dst,
+            ])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .expect("\n\nFailed to execute command\n\n");
+        Ok(())
+    } else {
+        Err(String::from("File not found"))
+    }
+}
+
+fn obtain_dst_path(src: &String, suffix: &str, extension: &str) -> String {
+    let src = Path::new(&src);
+    let file_stem = src.file_stem().unwrap().to_string_lossy().to_string();
+    let dst = src.with_file_name(format!("{}_{}.{}", file_stem, suffix, extension));
+    dst.to_string_lossy().to_string()
 }

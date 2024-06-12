@@ -13,24 +13,37 @@ type EditProps = {
   cropStartPosition: Position,
   cropEndPosition: Position,
   path: string | null,
-
 }
 
 const Edit = (props: EditProps) => {
-  const crop = () => {
-    if (!(props.path && props.cropStartPosition.x && props.cropStartPosition.y && props.cropEndPosition.x && props.cropEndPosition.y)) return;
-
-    invoke("crop", {
-      src: props.path,
-      startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では startX のように変換されていた。
-      startY: Math.trunc(Math.min(props.cropStartPosition.y, props.cropEndPosition.y)),
-      width: Math.trunc(Math.abs(props.cropStartPosition.x - props.cropEndPosition.x)),
-      height: Math.trunc(Math.abs(props.cropStartPosition.y - props.cropEndPosition.y)),
-    }).then(() => {
-      console.log('Sucess !!!');  // TODO: 240514 フロントエンドの UI にも通知せよ。(処理中なども表示できるといいかも？)
-    }).catch((err) => {
-      console.log(err);
-    });
+  const edit = () => {
+    if (props.mute) {
+      invoke('mute', {
+        src: props.path
+      }).then(() => {
+        console.log('Success "mute" !!!');
+      }).catch((err) => {
+        console.log(err);
+      })
+    
+    } else if (props.gif) {
+      // TODO: 240612 gif 関数を実行せよ。(パラメタ設定の UI も考えること)
+    } else if (props.compress) {
+      // TODO: 240612 compress 関数を実行せよ。(パラメタ設定の UI も考えること)
+    } else if (props.crop) {
+      if (!(props.path && props.cropStartPosition.x && props.cropStartPosition.y && props.cropEndPosition.x && props.cropEndPosition.y)) return;
+      invoke("crop", {
+        src: props.path,
+        startX: Math.trunc(Math.min(props.cropStartPosition.x, props.cropEndPosition.x)),  // INFO: 240514 Rust 側は start_x だが .tsx では startX のように変換されていた。
+        startY: Math.trunc(Math.min(props.cropStartPosition.y, props.cropEndPosition.y)),
+        width: Math.trunc(Math.abs(props.cropStartPosition.x - props.cropEndPosition.x)),
+        height: Math.trunc(Math.abs(props.cropStartPosition.y - props.cropEndPosition.y)),
+      }).then(() => {
+        console.log('Sucess "crop" !!!');  // TODO: 240514 フロントエンドの UI にも通知せよ。(処理中なども表示できるといいかも？)
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
   }
 
   const setMuteOn = () => {
@@ -91,7 +104,7 @@ const Edit = (props: EditProps) => {
         </li>
       </ul>
       {/* TODO: 240611 radio ボタンの分岐によって、適切にバックエンドに処理を投げること。 */}
-      <button onClick={crop}>Edit</button>
+      <button onClick={edit}>Edit</button>
     </>
   );
 }
