@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { open } from '@tauri-apps/api/dialog';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { DrawFunction, Position } from './types.ts'
+import { appWindow } from "@tauri-apps/api/window"
 
 
 type UploaderProps = {
@@ -46,13 +47,20 @@ const Uploader = (props: UploaderProps) => {
   }, [props.cropStartPosition, props.cropEndPosition])
 
   const upload = async () => {
-    const temp_path = await open();
-    if (typeof temp_path === 'string') {
-      props.setPath(temp_path);
+    const tempPath = await open();
+    if (typeof tempPath === 'string') {
+      props.setPath(tempPath);
     }
   }
 
-  // TODO: 240508 ドラッグアンドドロップでアップロードできるようにせよ。
+  appWindow.onFileDropEvent((event) => {
+    if (event.payload.type !== 'drop') {
+      return
+    }
+    const [filePath] = event.payload.paths
+    props.setPath(filePath);
+  })
+
   return (
     <button onClick={upload}>File Upload</button>
   )
