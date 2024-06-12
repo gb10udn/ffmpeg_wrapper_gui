@@ -12,7 +12,7 @@ const FFMPEG_URL: &str = "https://github.com/BtbN/FFmpeg-Builds/releases/downloa
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded, crop, mute])
+        .invoke_handler(tauri::generate_handler![download_ffmpeg, check_ffmpeg_downloaded, crop, mute, create_gif, compress_movie])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -58,6 +58,7 @@ fn check_ffmpeg_downloaded() -> bool {
     Path::new(FFMPEG_PATH).exists()
 }
 
+
 #[tauri::command]
 async fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) -> Result<(), String> {
     if Path::new(FFMPEG_PATH).exists() && Path::new(&src).exists() {
@@ -92,6 +93,7 @@ async fn crop(src: String, start_x: u32, start_y: u32, width: u32, height: u32) 
     }
 }
 
+
 #[tauri::command]
 async fn mute(src: String) -> Result<(), String> {
     if Path::new(FFMPEG_PATH).exists() && Path::new(&src).exists() {
@@ -114,6 +116,48 @@ async fn mute(src: String) -> Result<(), String> {
         Err(String::from("File not found"))
     }
 }
+
+
+#[tauri::command]
+async fn compress_movie(src: String, compress_param: u32) -> Result<(), String> {
+    let dst = obtain_dst_path(&src, &format!("compress={}", compress_param), "mp4");
+    Command::new(FFMPEG_PATH)
+        .args([
+            "-i",
+           &src,
+           "-crf",
+           &compress_param.to_string(),
+           &dst,
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .expect("Failed to execute command");
+    Ok(())
+}
+
+
+#[tauri::command]
+async fn create_gif(src: String, width: u32) -> Result<(), String> {
+    let dst = obtain_dst_path(&src, &width.to_string(), "gif");
+
+    Command::new(FFMPEG_PATH)
+        .args([
+            "-i",
+            &src,
+            "-vf",
+            &format!("scale={}:-1", width),
+            "-r",
+            "10",
+            &dst,
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .expect("\n\nFailed to execute command\n\n");
+    Ok(())
+}
+
 
 fn obtain_dst_path(src: &String, suffix: &str, extension: &str) -> String {
     let src = Path::new(&src);
