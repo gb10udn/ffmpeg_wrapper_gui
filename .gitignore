@@ -1,4 +1,5 @@
 public/*.mp4
+public/*.gif
 src-tauri/misc/ffmpeg.exe
 
 # Logs

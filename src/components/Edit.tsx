@@ -19,15 +19,22 @@ type EditProps = {
 const Edit = (props: EditProps) => {
   const [compressParam, setCompressParam] = useState<number>(30);
   const [gifWidth, setGifWidth] = useState<number>(1280);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [message, setMessage] = useState<String | null>(null);
 
   const edit = () => {
+    setIsEditing(true);
+    setMessage('Processing ...')
     if (props.mute) {
       invoke('mute', {
         src: props.path
       }).then(() => {
-        console.log('Success "mute" !!!');
+        setMessage('Success "mute" !!!');
+        setIsEditing(false);
       }).catch((err) => {
         console.log(err);
+        setMessage('Failure "mute" ...');
+        setIsEditing(false);
       })
 
     } else if (props.gif) {
@@ -35,9 +42,12 @@ const Edit = (props: EditProps) => {
         src: props.path,
         width: gifWidth,
       }).then(() => {
-        console.log('Success "gif" !!!');
+        setMessage('Success "gif" !!!');
+        setIsEditing(false);
       }).catch((err) => {
         console.log(err);
+        setMessage('Failure "gif" ...');
+        setIsEditing(false);
       })
     
     } else if (props.compress) {
@@ -45,9 +55,12 @@ const Edit = (props: EditProps) => {
         src: props.path,
         compressParam: compressParam,
       }).then(() => {
-        console.log('Success "compress" !!!');
+        setMessage('Success "compress" !!!');
+        setIsEditing(false);
       }).catch((err) => {
         console.log(err);
+        setMessage('Failure "compress" ...');
+        setIsEditing(false);
       })
     
     } else if (props.crop) {
@@ -59,9 +72,12 @@ const Edit = (props: EditProps) => {
         width: Math.trunc(Math.abs(props.cropStartPosition.x - props.cropEndPosition.x)),
         height: Math.trunc(Math.abs(props.cropStartPosition.y - props.cropEndPosition.y)),
       }).then(() => {
-        console.log('Sucess "crop" !!!');  // TODO: 240514 フロントエンドの UI にも通知せよ。(処理中なども表示できるといいかも？)
+        setMessage('Sucess "crop" !!!');
+        setIsEditing(false);
       }).catch((err) => {
         console.log(err);
+        setMessage('Failure "crop" ...');
+        setIsEditing(false);
       });
     }
   }
@@ -95,9 +111,8 @@ const Edit = (props: EditProps) => {
   }
 
   return (
-    // TODO: 240601 Edit (Crop など) の処理は時間がかかるので、実行中は再度クリックできないようにしていいかも？
     <div className="flex flex-row items-center pt-3">
-      <button onClick={edit} className="
+      <button onClick={edit} disabled={isEditing} className="
         bg-cyan-500 hover:bg-cyan-700
         text-white py-2 px-4
         rounded-full
@@ -133,6 +148,10 @@ const Edit = (props: EditProps) => {
           <label htmlFor="gif-width">gif width</label>
           <input type="number" className="ml-1 p-1 w-20 border rounded-md" value={gifWidth} id="gif-width" onChange={(event) => {setGifWidth(Number(event.target.value))}} />
         </div>
+      }
+
+      { message &&
+        <div className="pl-8 font-bold">{ message }</div>
       }
     </div>
   );
