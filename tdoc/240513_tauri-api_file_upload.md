@@ -49,3 +49,32 @@ const upload = async () => {
   "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
 },
 ```
+
+
+
+
+
+# 2. トラブルシューティング
+
+## 2.1. build 時の挙動が違う
+- `dev` 環境で実行した場合はできていたが、`build` 環境では、動画ファイルがアップロードできなかった。
+- `Refused to load media from { アップロードしたファイルパス } because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'media-src' was not explicitly set, so 'default-src' is used as a fallback.`
+
+### 2.1.1. build された .exe でコンソールを開く
+- `npm run tauri build -- --debug` で、コンソール付きの App が生成される (注意: `debug` フォルダに生成する。) ので、そこをチェックする。
+  - 参考: [Tauri 公式ドキュメント](https://tauri.app/v1/guides/debugging/application/)
+  - `npm run tauri build --debug` でないので、注意。(本当は、`--` が途中に必要。Rust の仕様と思う。)
+
+### 2.1.2. CSP (Content Security Policy: CSP)
+- [MDN ドキュメント: CSP](https://developer.mozilla.org/ja/docs/Web/HTTP/CSP)
+- 動画のポリシーを書いていなかったのでエラーが発生したみたい。
+- 動画は、`media-src` で設定できる。
+
+### 対策: Tauri の設定を書き換えた
+```json
+{
+  "security": {
+    "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost"
+  }
+}
+```
