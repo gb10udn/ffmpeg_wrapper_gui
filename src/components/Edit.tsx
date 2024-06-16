@@ -96,50 +96,45 @@ const Edit = (props: EditProps) => {
 
   return (
     // TODO: 240601 Edit (Crop など) の処理は時間がかかるので、実行中は再度クリックできないようにしていいかも？
-    <>
-      <ul>
-        <li>
-          <div>
-            <input id="mute" type="radio" name="edit" checked={props.mute} onChange={setMuteOn} />
-            <label htmlFor="mute">mute</label>
-          </div>
-        </li>
-        <li>
-          <div>
-            <input id="gif" type="radio" name="edit" checked={props.gif} onChange={setGifOn} />
-            <label htmlFor="gif">gif</label>
-          </div>
-        </li>
-        <li>
-          <div>
-            <input id="compress" type="radio" name="edit" checked={props.compress} onChange={setCompressOn} />
-            <label htmlFor="compress">compress</label>
-          </div>
-        </li>
-        <li>
-          <div>
-            <input id="crop" type="radio" name="edit" checked={props.crop} onChange={setCropOn} />
-            <label htmlFor="crop">crop</label>
-          </div>
-        </li>
-      </ul>
+    <div className="flex flex-row items-center pt-3">
+      <button onClick={edit} className="
+        bg-cyan-500 hover:bg-cyan-700
+        text-white py-2 px-4
+        rounded-full
+      ">
+        Edit
+      </button>
+      <div className="flex items-center pl-4">
+        <input id="mute" type="radio" name="edit" checked={props.mute} onChange={setMuteOn} className="h-4 w-4"/>
+        <label htmlFor="mute" className="ml-1">mute</label>
+      </div>
+      <div className="flex items-center pl-4">
+        <input id="gif" type="radio" name="edit" checked={props.gif} onChange={setGifOn} className="h-4 w-4" />
+        <label htmlFor="gif" className="ml-1">gif</label>
+      </div>
+      <div className="flex items-center pl-4">
+        <input id="compress" type="radio" name="edit" checked={props.compress} onChange={setCompressOn} className="h-4 w-4" />
+        <label htmlFor="compress" className="ml-1">compress</label>
+      </div>
+      <div className="flex items-center pl-4">
+        <input id="crop" type="radio" name="edit" checked={props.crop} onChange={setCropOn} className="h-4 w-4" />
+        <label htmlFor="crop" className="ml-1">crop</label>
+      </div>
 
       { props.compress &&
-        <div>
+        <div className="pl-8">
           <label htmlFor="compress-param">compress parameter</label>
-          <input type="number" value={compressParam} id="compress-param" onChange={(event) => {setCompressParam(Number(event.target.value))}}/>
+          <input type="number" className="ml-1 p-1 w-12 border rounded-md" value={compressParam} id="compress-param" onChange={(event) => {setCompressParam(Number(event.target.value))}}/>
         </div>
       }
       
       { props.gif &&
-        <div>
+        <div className="pl-8">
           <label htmlFor="gif-width">gif width</label>
-          <input type="number" value={gifWidth} id="gif-width" onChange={(event) => {setGifWidth(Number(event.target.value))}} />
+          <input type="number" className="ml-1 p-1 w-20 border rounded-md" value={gifWidth} id="gif-width" onChange={(event) => {setGifWidth(Number(event.target.value))}} />
         </div>
       }
-
-      <button onClick={edit}>Edit</button>
-    </>
+    </div>
   );
 }
 

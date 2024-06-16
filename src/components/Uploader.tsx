@@ -62,7 +62,18 @@ const Uploader = (props: UploaderProps) => {
   })
 
   return (
-    <button onClick={upload}>File Upload</button>
+    <>
+      <div className='flex flex-row items-center'>
+        <button onClick={upload} className='
+          bg-cyan-500 hover:bg-cyan-700
+          text-white py-2 px-4
+          rounded-full
+        '>
+          File
+        </button>
+        <div className='pl-4'>{ props.path?.split('\\').slice(-1)[0] }</div>
+      </div>
+    </>
   )
 }
 

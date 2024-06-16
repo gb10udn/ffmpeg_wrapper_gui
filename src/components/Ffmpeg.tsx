@@ -42,7 +42,7 @@ const Ffmpeg = () => {
   return (
     <>
       { downloaded &&
-        <div className="p-4 my-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
+        <div className="p-4 my-4 text-sm text-cyan-800 rounded-lg bg-cyan-50" role="alert">
           <span className="font-medium">ffmpeg downloaded success !!!</span> Upload and edit your movie
         </div>
       }
