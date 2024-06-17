@@ -70,11 +70,40 @@ const upload = async () => {
 - 動画のポリシーを書いていなかったのでエラーが発生したみたい。
 - 動画は、`media-src` で設定できる。
 
-### 対策: Tauri の設定を書き換えた
+### 2.1.3. 対策: Tauri の設定を書き換えた
 ```json
 {
   "security": {
     "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost"
   }
 }
+```
+
+
+## 2.2. ビルド不能
+- エラーメッセージ
+  ```
+  LLVM ERROR: out of memory
+  Allocation failed
+  error: could not compile ffmpeg_wrapper_gui (bin "ffmpeg_wrapper_gui")
+  ```
+- メモリ不足でコンパイルエラーが出た。
+
+### 2.2.1. 対策1: 【効果無し】build キャッシュ初期化
+- `git` からプロジェクトを再ダウンロードすると、普通に build できたので。
+
+```bash
+cd ./tauri-src
+cargo clean  # これで過去の設定をクリアできるみたい。
+
+cd ..
+npm run tauri dev
+```
+
+### 2.2.2. 対策2: 【効果有り】並列数抑制
+- 以下コマンド実行で、ビルドできた。
+
+```powershell
+$env:RUSTFLAGS="-C codegen-units=1 -C incremental=false"  # 一時的な環境変数設定
+npm run tauri build
 ```

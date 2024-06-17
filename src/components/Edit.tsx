@@ -24,7 +24,7 @@ const Edit = (props: EditProps) => {
 
   const edit = () => {
     setIsEditing(true);
-    setMessage('Processing ...')
+    setMessage('Processing ...')  // FIXME: 240616 本番環境で実行すると、ffmpeg のコンソール画面が開いてしまう？？？
     if (props.mute) {
       invoke('mute', {
         src: props.path
